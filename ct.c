@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <malloc.h>
+#define pi 3.14159
+//which is just 3 since everything is an int
 //cc -o ct ct.c -lm
 typedef struct {
 	int len;
@@ -19,17 +21,20 @@ void getsamples( sampleset *s) {
 	int c=0;
 	int blocks=400;
 	char ins[9000];//dont go over 9000
-	s->len=blocks;
+	s->len=1;
+	s->samples=malloc(1);
 	while(gets(ins) && !feof(stdin)) {
 		if(c>s->len){
-			s->samples=realoc(s->samples,s->len+blocks);//TODO: error checking (this whole function really)
+			s->samples=realloc(
+				s->samples,
+				s->len+blocks);//TODO: error checking (this whole function really)
 			s->len+=blocks;
 		}
-		(s->samples+c)=atoi(ins);
+		*(s->samples+c)=atoi(ins);
 	}
 		
 }
-void dumpsamples(sampleset s) {
+void dumps(sampleset s) {
 	int i=0;
 	for(i=0;i<s.len;i++)
 		printf("%d\n",*(s.samples+i));
@@ -56,13 +61,14 @@ sampleset transform(int bincount,int a, int b, int (*f)(int) ) {//not thread saf
 	func=f;
 	for(i=0;i<bins.len;i++)
 		*(bins.samples+i)=aint(a,b,costf,i); 
+	printf("transformed!%d\n",c);
 	return bins;
 	
 }
 //-----------
 int main (int argc, char *argv[]) {
-	getsampls(&s);
-	b=transform(10,0,len,slookup);
+	getsamples(&s);
+	b=transform(10,0,s.len,slookup);
 	dumps(b);
 	free(b.samples);
 }
