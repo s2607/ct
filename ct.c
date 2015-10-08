@@ -24,14 +24,18 @@ void getsamples( sampleset *s) {
 	s->len=1;
 	s->samples=malloc(1);
 	while(gets(ins) && !feof(stdin)) {
-		if(c>s->len){
+		printf("%d\n",c);
+		if(c>=s->len){
 			s->samples=realloc(
 				s->samples,
 				s->len+blocks);//TODO: error checking (this whole function really)
 			s->len+=blocks;
+			printf("realoc %d\n",s->len);
 		}
 		*(s->samples+c)=atoi(ins);
+		c+=1;
 	}
+	s->len=c;
 		
 }
 void dumps(sampleset s) {
@@ -43,25 +47,28 @@ void dumps(sampleset s) {
 int (*func)(int); //pointer to function to transform
 int costf(int x,int v) { //cos transform formula where x is integration var, and v is frequency
 	//not thread safe (at all)
-	return cos(x*pi*v)*(*func)(x);
+	int o= cos(x*pi*v)*(*func)(x);
+	printf("%d\t%d\n",v,o);
+	return o;
 }
 int aint (int a, int b, int (*f)(int,int), int v) { //sum f(x,v) from x=a to x=b with v constant (aproximate integral maybe better later)
 	int i=0;//It's really a reiman sum so we should use i and not x
 	int c=0;//counter
 	for(i=a;i<=b;i++) {
-		c=(*f)(i,v);
+		c+=(*f)(i,v);
 	}
+	printf("int:%d %d\n",c,v);
 	return c;
 }
 sampleset transform(int bincount,int a, int b, int (*f)(int) ) {//not thread safe
 	sampleset bins;
 	bins.len=bincount;
-	bins.samples=malloc(s.len);
+	bins.samples=malloc(bincount);
 	int i=0;
 	func=f;
 	for(i=0;i<bins.len;i++)
 		*(bins.samples+i)=aint(a,b,costf,i); 
-	printf("transformed!%d\n",c);
+	printf("transformed!\n");
 	return bins;
 	
 }
@@ -70,5 +77,6 @@ int main (int argc, char *argv[]) {
 	getsamples(&s);
 	b=transform(10,0,s.len,slookup);
 	dumps(b);
-	free(b.samples);
+	//free(b.samples);
+	return 0;
 }
