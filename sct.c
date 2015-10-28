@@ -24,13 +24,14 @@ double sinc(double x) {
 	return sin(x)/x;
 }
 double f(double x) {
-	return circle(x,4);
+	return pulse(x);
 
 }
 
 int main() {
 	double c;
 	double x=0;
+	char *pcom;
 	FILE *fp= fopen("transformed.dat","w");
 	fprintf(fp,"# X Y\n");
 	for(x=-6; x<6;x+=0.1) {
@@ -44,6 +45,6 @@ int main() {
 		fprintf(fp,"%f %f\n",x,c*0.001);
 	}
 	fclose(fp);	
-	exec("gnuplot");
+	system("gnuplot -e \"set term dumb ;plot 'transformed.dat'\"");
 	return 0;
 }
